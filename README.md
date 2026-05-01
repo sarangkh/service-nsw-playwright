@@ -215,7 +215,13 @@ No secrets should be committed to repository files.
 
 ## Additional Documentation
 
-- `QUICK_START.md` - fast setup/run reference
+- `docs/quick_start.md` - fast setup/run reference
+- `docs/resources.md` - useful links and references
+- `docs/summary.md` - concise framework summary
+- `docs/architecture.md` - architecture and execution flow
+- `docs/troubleshooting.md` - common issues and fixes
+- `docs/examples/basic_test.md` - starter examples
+- `docs/examples/advanced_patterns.md` - extensibility patterns
 - `.github/workflows/playwright-tests.yml` - CI implementation details
 - `.env.example` - configuration template
 
