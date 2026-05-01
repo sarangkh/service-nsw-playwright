@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { FuelClient } from '../../api/fuelClient';
 
 test.describe('Fuel API - Simple Scenarios', () => {
-  test('FUEL-001 @core: Generate OAuth access token', async ({ request }) => {
+  test('FUEL-001 Generate OAuth access token', async ({ request }) => {
     const fuelClient = new FuelClient(request);
     expect(fuelClient.hasCredentials(), 'Missing Fuel API auth credentials in env').toBeTruthy();
 
