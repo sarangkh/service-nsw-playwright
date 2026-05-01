@@ -18,10 +18,8 @@ export default defineConfig({
   
   /* Simple reporters */
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
-    ['junit', { outputFile: 'test-results/junit.xml' }],
-    ['playwright-ctrf-json-reporter', { outputFile: 'ctrf-report.json' }],
-    ['list']
+    ['list'],
+    ['playwright-ctrf-json-reporter', {}]
   ],
   /* Shared settings for all the projects below */
   use: {
