@@ -18,6 +18,7 @@ export default defineConfig({
   
   /* Simple reporters */
   reporter: [
+    ['html', { outputFolder: 'playwright-report' }],
     ['list'],
     ['playwright-ctrf-json-reporter', {}]
   ],
