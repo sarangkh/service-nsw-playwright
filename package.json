@@ -1,0 +1,31 @@
+{
+  "name": "service-nsw-playwright",
+  "version": "1.0.0",
+  "description": "Simple Playwright test automation for NSW Services",
+  "main": "index.js",
+  "scripts": {
+    "test": "node scripts/run-tests.js dev",
+    "test:dev": "node scripts/run-tests.js dev",
+    "test:test": "node scripts/run-tests.js test",
+    "test:headed": "playwright test --headed",
+    "test:local": "node scripts/run-tests.js local",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report"
+  },
+  "keywords": [
+    "playwright",
+    "automation",
+    "testing",
+    "api",
+    "ui"
+  ],
+  "author": "NSW Test Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.45.0",
+    "@types/node": "^20.0.0",
+    "dotenv": "^16.0.0",
+    "playwright-ctrf-json-reporter": "^0.0.29",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,71 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TEST_ENV: test
+      ENVIRONMENT: test
+      UI_BASE_URL: https://www.service.nsw.gov.au
+      UI_SEARCH_PATH: /search-results
+      FUEL_API_BASE_URL: https://api.onegov.nsw.gov.au
+      FUEL_API_OAUTH_PATH: /oauth/client_credential/accesstoken?grant_type=client_credentials
+      FUEL_API_LOVS_PATH: /FuelCheckRefData/v1/fuel/lovs
+      FUEL_API_KEY: ${{ secrets.FUEL_API_KEY }}
+      FUEL_API_SECRET: ${{ secrets.FUEL_API_SECRET }}
+      FUEL_API_AUTH_HEADER: ${{ secrets.FUEL_API_AUTH_HEADER }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run tests
+        run: npx playwright test
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload JUnit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-results
+          path: test-results/junit.xml
+
+      - name: Upload CTRF report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctrf-report
+          path: ctrf/ctrf-report.json
+          retention-days: 7
+
+      - name: Publish CTRF summary
+        if: always()
+        shell: bash
+        run: |
+          if [ ! -f "ctrf/ctrf-report.json" ]; then
+            echo "CTRF report not found: ctrf/ctrf-report.json" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          node -e "const fs=require('fs'); const r=JSON.parse(fs.readFileSync('ctrf/ctrf-report.json','utf8')); const results=Array.isArray(r.results)?r.results:[]; const summary=r.summary||{}; const total=summary.tests ?? results.length; const passed=summary.passed ?? results.filter(x=>x.status==='passed').length; const failed=summary.failed ?? results.filter(x=>x.status==='failed').length; const skipped=summary.skipped ?? results.filter(x=>x.status==='skipped').length; const out=['## CTRF Test Execution Summary','',`- Total: ${total}`,`- Passed: ${passed}`,`- Failed: ${failed}`,`- Skipped: ${skipped}`,'',`Raw report: \`ctrf/ctrf-report.json\``,''].join('\n'); fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,out);"

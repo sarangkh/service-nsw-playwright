@@ -1,0 +1,24 @@
+{
+  "reportFormat": "CTRF",
+  "specVersion": "0.0.0",
+  "reportId": "f4be144e-0ecd-42b5-a9bd-af90356cb7e2",
+  "timestamp": "2026-05-01T10:06:02.121Z",
+  "generatedBy": "playwright-ctrf-json-reporter",
+  "results": {
+    "tool": {
+      "name": "playwright"
+    },
+    "summary": {
+      "tests": 0,
+      "passed": 0,
+      "failed": 0,
+      "pending": 0,
+      "skipped": 0,
+      "other": 0,
+      "start": 1777629962201,
+      "stop": 1777629962244,
+      "suites": 0
+    },
+    "tests": []
+  }
+}
