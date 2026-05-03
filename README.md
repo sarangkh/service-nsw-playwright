@@ -16,12 +16,13 @@ This repository is intentionally scoped to:
 | 3 | Install Chromium for Playwright: `npx playwright install chromium`. |
 | 4 | Add **Fuel API** credentials in a gitignored env file (see [Secrets and environment files](#secrets-and-environment-files)). Without them, Fuel API tests **fail** by design. |
 | 5 | (Optional) `npm run lint` — same checks as CI. |
-| 6 | Run tests: `npm run test:dev`, `npm run test:test`, or `npm run test:local`. These use `scripts/run-tests.js`, which sets `TEST_ENV` and runs Playwright **headless**. |
+| 6 | Run tests from the CLI (headless by default): `npm run test:dev`, `npm run test:test`, or `npm run test:local` (see [Running tests locally](#running-tests-locally-cli-and-ui-mode)). |
+| 7 | (Optional) Run or debug in **Playwright UI mode** locally: `npm run UI`, `npm run UI:test`, or `npm run UI:local` — same environments as the CLI scripts, with the interactive Test UI. |
 
 **Other commands**
 
 - `npm run test:headed` — browser visible (`playwright test --headed`; uses default env resolution from `config.ts` if `TEST_ENV` is unset).
-- `npm run test:debug` — Playwright inspector.
+- `npm run test:debug` — step through tests with the Playwright inspector (`playwright test --debug`).
 - `npm run report` — open the last HTML report under `playwright-report/` (ignored by git).
 
 ## Overall Architecture
@@ -137,17 +138,49 @@ Typical non-secret defaults (URLs/paths) match `.env.example`. Copy that file to
 
 **GitHub Actions** does not use repo env files for secrets. It injects [repository secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions) into the job environment (see next section). Non-secret URLs are set as plain `env:` entries in the workflow file.
 
-## How to execute tests locally
+## Running tests locally (CLI and UI mode)
+
+All `npm run test:*` and `npm run UI*` scripts go through [`scripts/run-tests.js`](scripts/run-tests.js), which sets `TEST_ENV` and then invokes the Playwright CLI. That keeps `.env.dev` / `.env.test` / `.env.local` aligned with the run without you having to set variables differently on Windows, macOS, or Linux.
+
+### CLI (headless default)
+
+These run the suite in the terminal (Chromium headless unless you use headed/debug scripts):
 
 ```bash
-npm run test:dev      # TEST_ENV=dev (via run-tests.js)
-npm run test:test     # TEST_ENV=test
-npm run test:local    # TEST_ENV=local
+npm run test:dev      # dev URLs / secrets from .env.dev (+ overrides)
+npm run test:test     # test profile
+npm run test:local    # local profile
 npm test              # same as test:dev
-npm run test:headed   # visible browser; set TEST_ENV in your shell if needed
-npm run test:debug
-npm run report        # open HTML report after a run
 ```
+
+Useful variants:
+
+```bash
+npm run test:headed   # visible browser; respects TEST_ENV if already set in the shell, else config defaults to dev
+npm run test:debug    # Playwright inspector for stepping through tests
+npm run report        # open the HTML report from the last run (playwright-report/)
+```
+
+Advanced: you can call Playwright directly if `TEST_ENV` is set before the process starts (so `config.ts` loads the right files), for example `npx playwright test`. The npm scripts above are the supported way to pick **dev** / **test** / **local** without shell-specific `export` / `set` syntax.
+
+### UI mode (Playwright Test UI)
+
+[Playwright’s Test UI](https://playwright.dev/docs/test-ui-mode) runs locally: pick tests, watch mode, time-travel debugging, and traces — separate from the HTML report opened by `npm run report`.
+
+```bash
+npm run UI            # dev profile + Test UI
+npm run UI:test       # test profile + Test UI
+npm run UI:local      # local profile + Test UI
+```
+
+Pass extra Playwright arguments after `--` (npm forwards them to `run-tests.js`, which appends them to `playwright test`). Examples:
+
+```bash
+npm run UI -- tests/ui-tests/homepage.spec.ts
+npm run test:dev -- --grep "search"
+```
+
+Close the Test UI window or stop the terminal process when you are finished.
 
 ## Linting
 

@@ -10,6 +10,9 @@
     "test:headed": "playwright test --headed",
     "test:local": "node scripts/run-tests.js local",
     "test:debug": "playwright test --debug",
+    "UI": "node scripts/run-tests.js dev --ui",
+    "UI:test": "node scripts/run-tests.js test --ui",
+    "UI:local": "node scripts/run-tests.js local --ui",
     "report": "playwright show-report",
     "lint": "eslint ."
   },
