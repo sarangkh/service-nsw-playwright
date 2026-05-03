@@ -268,7 +268,7 @@ The **Publish CTRF test report** step sets `GITHUB_TOKEN: ${{ secrets.GITHUB_TOK
 
 - **Live endpoint validation vs deterministic mocks**  
   Chosen: live endpoint checks for confidence in real integrations.  
-  Trade-off: susceptible to external downtime/rate limits.
+  Trade-off: can break if the external service is slow or unavailable.
 
 - **Single-browser CI (Chromium) vs multi-browser matrix**  
   Chosen: Chromium-only for faster pipeline.  
@@ -293,7 +293,7 @@ The **Publish CTRF test report** step sets `GITHUB_TOKEN: ${{ secrets.GITHUB_TOK
 5. **Quality gates**
    - PR-required smoke
    - Nightly regression
-   - Flake detection and quarantine pipeline
+   - Flake detection in pipeline
 
 6. **Observability**
    - Push JUnit/trace artifacts to centralized dashboard
@@ -333,4 +333,3 @@ Also useful: `.github/workflows/playwright-tests.yml` (CI), `.env.example` (conf
 - UI tests: 3
 - API tests: 2 (Fuel API)
 - Execution model: environment-driven (`dev`, `test`, `local`)
-
