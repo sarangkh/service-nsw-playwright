@@ -4,7 +4,7 @@ const environment = process.argv[2] || 'dev';
 const extraArgs = process.argv.slice(3);
 const playwrightCli = require.resolve('@playwright/test/cli');
 
-const result = spawnSync(process.execPath, [playwrightCli, 'test', '--headed', ...extraArgs], {
+const result = spawnSync(process.execPath, [playwrightCli, 'test', ...extraArgs], {
   stdio: 'inherit',
   env: {
     ...process.env,

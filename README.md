@@ -7,6 +7,23 @@ This repository is intentionally scoped to:
 - 2 Fuel API scenarios (OAuth + LOVs)
 - Environment-based execution (`dev`, `test`, `local`)
 
+## Getting started (run everything locally)
+
+| Step | Action |
+| --- | --- |
+| 1 | Clone the repo and `cd` into the project root. |
+| 2 | Install packages: `npm ci` (same lockfile as CI) or `npm install`. |
+| 3 | Install Chromium for Playwright: `npx playwright install chromium`. |
+| 4 | Add **Fuel API** credentials in a gitignored env file (see [Secrets and environment files](#secrets-and-environment-files)). Without them, Fuel API tests **fail** by design. |
+| 5 | (Optional) `npm run lint` — same checks as CI. |
+| 6 | Run tests: `npm run test:dev`, `npm run test:test`, or `npm run test:local`. These use `scripts/run-tests.js`, which sets `TEST_ENV` and runs Playwright **headless**. |
+
+**Other commands**
+
+- `npm run test:headed` — browser visible (`playwright test --headed`; uses default env resolution from `config.ts` if `TEST_ENV` is unset).
+- `npm run test:debug` — Playwright inspector.
+- `npm run report` — open the last HTML report under `playwright-report/` (ignored by git).
+
 ## Overall Architecture
 
 The framework uses a layered design:
@@ -60,17 +77,24 @@ The framework uses a layered design:
 - **GitHub Actions**  
   Native GitHub integration for CI and secret management.
 
-## Project Structure
+## Project structure and files
+
+Everything below is **committed on purpose** except generated folders (`node_modules/`, `playwright-report/`, `test-results/`, `ctrf/`), which are recreated when you install or run tests.
 
 ```text
 service-nsw-playwright/
 ├── api/
-│   └── fuelClient.ts
+│   └── fuelClient.ts              # Fuel API client (OAuth + LOVs)
+├── docs/                          # Extra Markdown guides (see end of README)
+├── fixtures/
+│   ├── testData.ts                # Picks test data by config.environment
+│   ├── testData.dev.ts
+│   └── testData.test.ts
 ├── pages/
 │   ├── HomePage.ts
-│   └── SearchResultsPage.ts
+│   └── SearchResultsPage.ts       # Locators + actions only (assertions live in specs)
 ├── scripts/
-│   └── run-tests.js
+│   └── run-tests.js               # Sets TEST_ENV, then runs Playwright CLI
 ├── tests/
 │   ├── api-tests/
 │   │   └── fuel-api.spec.ts
@@ -78,92 +102,121 @@ service-nsw-playwright/
 │       └── homepage.spec.ts
 ├── .github/workflows/
 │   └── playwright-tests.yml
-├── config.ts
-├── playwright.config.ts
-├── package.json
-└── .env.example / .env.dev / .env.test / .env.local
+├── .env.example                   # Template only — safe to commit (no real secrets)
+├── config.ts                      # Loads dotenv + exports `config`
+├── playwright.config.ts           # Playwright runner, reporters, baseURL
+├── tsconfig.json                  # TypeScript compiler options
+├── eslint.config.mjs              # ESLint + typescript-eslint + Playwright plugin
+├── package.json / package-lock.json
+└── README.md
 ```
 
-## Setup Instructions
+### Prerequisites
 
-### 1) Prerequisites
+- **Node.js 20+** and **npm** (CI uses Node 20).
 
-- Node.js 20+ recommended
-- npm
+## Secrets and environment files
 
-### 2) Install dependencies
+**Never commit real API keys or Basic auth strings.** Use gitignored files (see `.gitignore`: `.env`, `.env.*`, `.env.local`, `.env.*.local`, with `!.env.example` kept in the repo).
 
-```bash
-npm install
-npx playwright install chromium
-```
+`config.ts` resolves the active environment from `TEST_ENV` or `ENVIRONMENT` (`dev` \| `test` \| `local`, default `dev`), then loads dotenv in this **order** (later files can override earlier keys):
 
-### 3) Environment configuration
-
-Create one of:
-- `.env.dev.local`
-- `.env.test.local`
-- `.env.local.local` (if using `TEST_ENV=local`) or place secrets directly in `.env.local`
-
-The loader reads:
 1. `.env`
 2. `.env.local`
-3. `.env.<env>`
-4. `.env.<env>.local`
+3. `.env.<environment>` (e.g. `.env.test` when `TEST_ENV=test`)
+4. `.env.<environment>.local` (e.g. `.env.test.local` — **recommended place for secrets**)
 
-### 4) Required API secrets (Fuel API)
+**Fuel API (required for passing API tests)**
 
-Use either:
+Provide either:
 
-- `FUEL_API_AUTH_HEADER=Basic <base64(api_key:api_secret)>`
+- `FUEL_API_AUTH_HEADER=Basic <base64(api_key:api_secret)>`, **or**
+- `FUEL_API_KEY` and `FUEL_API_SECRET`
 
-or
+Typical non-secret defaults (URLs/paths) match `.env.example`. Copy that file to something like `.env.test.local`, fill in Fuel fields, then run `npm run test:test` so `TEST_ENV=test` matches your file names.
 
-- `FUEL_API_KEY=<key>`
-- `FUEL_API_SECRET=<secret>`
+**GitHub Actions** does not use repo env files for secrets. It injects [repository secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions) into the job environment (see next section). Non-secret URLs are set as plain `env:` entries in the workflow file.
 
-Recommended keys:
-
-```env
-FUEL_API_BASE_URL=https://api.onegov.nsw.gov.au
-FUEL_API_OAUTH_PATH=/oauth/client_credential/accesstoken?grant_type=client_credentials
-FUEL_API_LOVS_PATH=/FuelCheckRefData/v1/fuel/lovs
-FUEL_API_AUTH_HEADER=Basic <...>
-```
-
-## How To Execute Tests Locally
-
-### Environment-based runs
+## How to execute tests locally
 
 ```bash
-npm run test:dev
-npm run test:test
-npm run test:local
+npm run test:dev      # TEST_ENV=dev (via run-tests.js)
+npm run test:test     # TEST_ENV=test
+npm run test:local    # TEST_ENV=local
+npm test              # same as test:dev
+npm run test:headed   # visible browser; set TEST_ENV in your shell if needed
+npm run test:debug
+npm run report        # open HTML report after a run
 ```
 
-### Other useful runs
+## Linting
+
+Static analysis keeps tests aligned with common TypeScript and Playwright guidance.
+
+### Run locally
 
 ```bash
-npm test                # defaults to dev
-npm run test:headed     # headed mode via Playwright directly
-npm run test:debug      # Playwright debug mode
-npm run report          # open HTML report
+npm run lint
 ```
 
-## GitHub Actions and Secrets
+This runs [ESLint](https://eslint.org/) over the TypeScript sources (excluding generated folders and `scripts/`, which is plain Node).
 
-Workflow file: `.github/workflows/playwright-tests.yml`
+### What is configured
 
-The workflow expects Fuel secrets from GitHub Secrets:
+| Piece | Role |
+| --- | --- |
+| `eslint.config.mjs` | ESLint 9 **flat config** at the repo root |
+| `@eslint/js` | Core JavaScript recommended rules |
+| `typescript-eslint` | TypeScript-aware linting (`recommended`) |
+| `eslint-plugin-playwright` | [`flat/recommended`](https://github.com/mskelton/eslint-plugin-playwright) applied to `tests/**/*.ts` |
 
-- `FUEL_API_KEY` (optional if auth header provided)
-- `FUEL_API_SECRET` (optional if auth header provided)
-- `FUEL_API_AUTH_HEADER` (recommended)
+Playwright rules encourage web-first assertions, valid `test`/`expect` usage, and other checks described in the [plugin rule list](https://github.com/mskelton/eslint-plugin-playwright#rules). They complement the [Playwright best-practices](https://playwright.dev/docs/best-practices) docs.
 
-Add these in:
-- **GitHub Repository -> Settings -> Secrets and variables -> Actions**
+**API tests** (`tests/api-tests/`): `playwright/no-conditional-in-test` and `playwright/no-conditional-expect` are turned off there so specs can branch on HTTP status (for example 200 vs 401/403) without fighting the linter.
 
-No secrets should be committed to repository files.
+### CI
+
+The GitHub Actions workflow runs `npm run lint` before installing browsers and running Playwright, so broken or discouraged patterns fail the pipeline early.
+
+## GitHub Actions (CI run)
+
+Workflow: [`.github/workflows/playwright-tests.yml`](.github/workflows/playwright-tests.yml)
+
+**When it runs**
+
+- **Push** and **pull_request** to `main` or `develop`
+- **workflow_dispatch** (manual “Run workflow” in the Actions tab)
+
+**What the job does (in order)**
+
+1. Checkout code  
+2. **setup-node** (Node 20, npm cache from `package-lock.json`)  
+3. `npm ci` — install dependencies exactly as locked  
+4. `npm run lint` — ESLint; failures stop the job before browsers  
+5. `npx playwright install --with-deps chromium`  
+6. `npx playwright test` — full suite (UI hits live Service NSW; API hits Fuel API with secrets)  
+7. **Publish CTRF test report** — `ctrf-io/github-test-reporter@v1` reads `./ctrf/*.json` (generated under `ctrf/` during the run; folder is gitignored locally)  
+8. **Upload artifact** — `playwright-report/` ZIP for 7 days  
+
+**Environment variables in CI**
+
+- **Plain `env:` in the workflow** (not secret): `TEST_ENV`, `ENVIRONMENT`, `UI_BASE_URL`, `UI_SEARCH_PATH`, Fuel base URLs/paths — aligned with `.env.example` / committed `.env.<environment>` files.
+- **Secrets** (configure under **Repository → Settings → Secrets and variables → Actions**):
+  - `FUEL_API_KEY` (optional if you only use the header)
+  - `FUEL_API_SECRET` (optional if you only use the header)
+  - `FUEL_API_AUTH_HEADER` (recommended if you use a single Basic header)
+
+The workflow maps them to `FUEL_API_*` env vars the same way you would locally.
+
+**`GITHUB_TOKEN`**
+
+The **Publish CTRF test report** step sets `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}`. GitHub creates this token automatically for each job; you do **not** add `GITHUB_TOKEN` under repository secrets.
+
+**Viewing results**
+
+- **Actions** tab → select the workflow run → job logs; check steps for lint/test failures.  
+- Download the **playwright-report** artifact for the HTML report.  
+- CTRF step adds check/run annotations when the action succeeds.
 
 ## Assumptions Made
 
@@ -215,15 +268,32 @@ No secrets should be committed to repository files.
 
 ## Additional Documentation
 
-- `docs/quick_start.md` - fast setup/run reference
-- `docs/resources.md` - useful links and references
-- `docs/summary.md` - concise framework summary
-- `docs/architecture.md` - architecture and execution flow
-- `docs/troubleshooting.md` - common issues and fixes
-- `docs/examples/basic_test.md` - starter examples
-- `docs/examples/advanced_patterns.md` - extensibility patterns
-- `.github/workflows/playwright-tests.yml` - CI implementation details
-- `.env.example` - configuration template
+Markdown guides live under **`docs/`**:
+
+| File | Contents |
+| --- | --- |
+| `docs/quick_start.md` | Fast setup and run reference |
+| `docs/resources.md` | Useful links and references |
+| `docs/summary.md` | Concise framework summary |
+| `docs/architecture.md` | Architecture and execution flow |
+| `docs/troubleshooting.md` | Common issues and fixes |
+| `docs/examples/basic_test.md` | Starter examples |
+| `docs/examples/advanced_patterns.md` | Extensibility patterns |
+
+Also useful: `.github/workflows/playwright-tests.yml` (CI), `.env.example` (configuration template).
+
+### How to read these on the web
+
+1. **GitHub (no extra setup)**  
+   After you push this repository to GitHub, open any file under `docs/` in the browser. GitHub renders Markdown automatically. The URL shape is:  
+   `https://github.com/<your-org>/<your-repo>/blob/<branch>/docs/quick_start.md`  
+   (replace org, repo, and branch; for the default branch, `main` is typical.)
+
+2. **In the editor (local preview)**  
+   In VS Code or Cursor, open a `.md` file and use **Markdown: Open Preview** (command palette) or the preview icon so you see formatted output without leaving the project.
+
+3. **Optional: GitHub Pages**  
+   If you want a dedicated site (table of contents, theme, search), you can enable [GitHub Pages](https://docs.github.com/pages) and point it at the `docs/` folder or a static site generator; that is not configured in this repo by default.
 
 ## Current Scope Summary
 

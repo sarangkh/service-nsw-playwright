@@ -10,7 +10,8 @@
     "test:headed": "playwright test --headed",
     "test:local": "node scripts/run-tests.js local",
     "test:debug": "playwright test --debug",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "lint": "eslint ."
   },
   "keywords": [
     "playwright",
@@ -22,10 +23,15 @@
   "author": "NSW Test Team",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.45.0",
     "@types/node": "^20.0.0",
     "dotenv": "^16.0.0",
+    "eslint": "^10.3.0",
+    "eslint-plugin-playwright": "^2.10.2",
+    "globals": "^17.6.0",
     "playwright-ctrf-json-reporter": "^0.0.29",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.59.1"
   }
 }

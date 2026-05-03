@@ -8,8 +8,7 @@ import { config } from './config';
 export default defineConfig({
   /* Test directories */
   testMatch: ['tests/ui-tests/**/*.spec.ts', 'tests/api-tests/**/*.spec.ts'],
-  testIgnore: ['tests/api-tests/products.spec.ts'],
-  
+
   /* Run tests in parallel */
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

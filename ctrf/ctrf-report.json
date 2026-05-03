@@ -1,24 +1,130 @@
 {
   "reportFormat": "CTRF",
   "specVersion": "0.0.0",
-  "reportId": "f4be144e-0ecd-42b5-a9bd-af90356cb7e2",
-  "timestamp": "2026-05-01T10:06:02.121Z",
+  "reportId": "6a77b8e9-9f8e-48cb-aa30-7458b7b52352",
+  "timestamp": "2026-05-03T11:28:53.257Z",
   "generatedBy": "playwright-ctrf-json-reporter",
   "results": {
     "tool": {
       "name": "playwright"
     },
     "summary": {
-      "tests": 0,
-      "passed": 0,
+      "tests": 5,
+      "passed": 5,
       "failed": 0,
       "pending": 0,
       "skipped": 0,
       "other": 0,
-      "start": 1777629962201,
-      "stop": 1777629962244,
+      "start": 1777807733365,
+      "stop": 1777807742344,
       "suites": 0
     },
-    "tests": []
+    "tests": [
+      {
+        "name": "API-001 Generate OAuth access token",
+        "status": "passed",
+        "duration": 248,
+        "start": 1777807734,
+        "stop": 1777807734,
+        "rawStatus": "passed",
+        "tags": [],
+        "type": "e2e",
+        "filePath": "C:\\workspace\\service-nsw-playwright\\tests\\api-tests\\fuel-api.spec.ts",
+        "retries": 0,
+        "flaky": false,
+        "steps": [],
+        "suite": "chromium > tests\\api-tests\\fuel-api.spec.ts > Fuel API - Simple Scenarios",
+        "attachments": [],
+        "stdout": [],
+        "stderr": [],
+        "extra": {
+          "annotations": []
+        }
+      },
+      {
+        "name": "API-002 Get Fuel LOVs reference data",
+        "status": "passed",
+        "duration": 269,
+        "start": 1777807734,
+        "stop": 1777807734,
+        "rawStatus": "passed",
+        "tags": [],
+        "type": "e2e",
+        "filePath": "C:\\workspace\\service-nsw-playwright\\tests\\api-tests\\fuel-api.spec.ts",
+        "retries": 0,
+        "flaky": false,
+        "steps": [],
+        "suite": "chromium > tests\\api-tests\\fuel-api.spec.ts > Fuel API - Simple Scenarios",
+        "attachments": [],
+        "stdout": [],
+        "stderr": [],
+        "extra": {
+          "annotations": []
+        }
+      },
+      {
+        "name": "UI-001 Validate homepage loads successfully",
+        "status": "passed",
+        "duration": 5215,
+        "start": 1777807734,
+        "stop": 1777807739,
+        "rawStatus": "passed",
+        "tags": [],
+        "type": "e2e",
+        "filePath": "C:\\workspace\\service-nsw-playwright\\tests\\ui-tests\\homepage.spec.ts",
+        "retries": 0,
+        "flaky": false,
+        "steps": [],
+        "suite": "chromium > tests\\ui-tests\\homepage.spec.ts > Service NSW - Public Website UI Scenarios",
+        "attachments": [],
+        "stdout": [],
+        "stderr": [],
+        "extra": {
+          "annotations": []
+        }
+      },
+      {
+        "name": "UI-002 Validate important UI elements",
+        "status": "passed",
+        "duration": 6579,
+        "start": 1777807734,
+        "stop": 1777807741,
+        "rawStatus": "passed",
+        "tags": [],
+        "type": "e2e",
+        "filePath": "C:\\workspace\\service-nsw-playwright\\tests\\ui-tests\\homepage.spec.ts",
+        "retries": 0,
+        "flaky": false,
+        "steps": [],
+        "suite": "chromium > tests\\ui-tests\\homepage.spec.ts > Service NSW - Public Website UI Scenarios",
+        "attachments": [],
+        "stdout": [],
+        "stderr": [],
+        "extra": {
+          "annotations": []
+        }
+      },
+      {
+        "name": "UI-003 Search for a service (driver licence renewal)",
+        "status": "passed",
+        "duration": 5814,
+        "start": 1777807734,
+        "stop": 1777807740,
+        "rawStatus": "passed",
+        "tags": [],
+        "type": "e2e",
+        "filePath": "C:\\workspace\\service-nsw-playwright\\tests\\ui-tests\\homepage.spec.ts",
+        "retries": 0,
+        "flaky": false,
+        "steps": [],
+        "suite": "chromium > tests\\ui-tests\\homepage.spec.ts > Service NSW - Public Website UI Scenarios",
+        "attachments": [],
+        "stdout": [],
+        "stderr": [],
+        "extra": {
+          "annotations": []
+        }
+      }
+    ]
   }
 }

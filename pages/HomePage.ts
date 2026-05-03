@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 export class HomePage {
   readonly page: Page;
@@ -19,23 +19,11 @@ export class HomePage {
     this.searchButton = this.searchForm.locator('button[type="submit"]').first();
   }
 
-  async open(): Promise<void> {
+  async open() {
     await this.page.goto('/', { waitUntil: 'domcontentloaded' });
   }
 
-  async assertLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(/service\.nsw\.gov\.au/);
-    await expect(this.page).toHaveTitle(/.+/);
-    await expect(this.heading).toBeVisible();
-  }
-
-  async assertCoreElementsVisible(): Promise<void> {
-    await expect(this.header).toBeVisible();
-    await expect(this.footer).toBeVisible();
-    await expect(this.searchInput).toBeVisible();
-  }
-
-  async searchForService(searchTerm: string): Promise<void> {
+  async searchForService(searchTerm: string) {
     await this.searchInput.fill(searchTerm);
     await this.searchButton.click();
     await this.page.waitForLoadState('domcontentloaded');

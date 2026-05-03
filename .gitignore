@@ -12,6 +12,7 @@ yarn.lock
 # Test results
 test-results/
 playwright-report/
+ctrf/
 blob-report/
 reports/
 .nyc_output/
